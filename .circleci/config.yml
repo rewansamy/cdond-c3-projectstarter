@@ -243,40 +243,34 @@ jobs:
 
   deploy-frontend:
     docker:
-      # Docker image here that supports AWS CLI
-      - image: amazon/aws-cli
+     - image: amazon/aws-cli
     steps:
       - checkout
       - run:
           name: Install dependencies
           command: |
-            # your code here
-            yum update -y
-            yum install -y tar gzip
-            yum install python3
-            curl -sL https://deb.nodesource.com/setup_10.x | bash -
-            yum install -y nodejs
-            pip3 install ansible
-            pip3 install awscli
-
+           yum update -y
+           yum install -y tar gzip
+           yum install -y python3
+           curl -sL https://rpm.nodesource.com/setup_10.x |  bash -
+           yum install -y nodejs
+           pip3 install ansible
+           pip3 install awscli
       - run:
           name: Get backend url
           command: |
-            # your code here
             export BACKEND_IP=$(aws ec2 describe-instances \
-              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text)
+            --query 'Reservations[*].Instances[*].PublicDnsName' \
+            --filters "Name=tag:Name,Values= backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
-
       - run:
           name: Deploy frontend objects
           command: |
-            # your code here
-            cd frontend
+            cd frontend 
             cat .env
             npm install
             npm run build
@@ -288,39 +282,33 @@ jobs:
                     
   deploy-backend:
     docker:
-      # Docker image here that supports Ansible
       - image: python:3.7-alpine3.11
     steps:
-      # Checkout code from git
       - checkout
-      # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints:
-            - "db:10:63:a8:a1:c1:c8:44:27:07:e7:aa:d9:62:ee:0d"
-      # attach workspace
+         fingerprints: ["	44:15:3d:14:fb:2a:01:30:79:7e:39:35:97:8a:4e:90"] 
       - attach_workspace:
-          at: ~/ 
+          at: ~/
       - run:
           name: Install dependencies
           command: |
-            # your code here
             apk add --update ansible
             apk add --update nodejs npm
             apk add curl
-            apk add tar gzip ansible
             pip3 install awscli
-
-            
       - run:
-          name: Deploy backend
+          name: install dependencies  and send app folder to ansible
           command: |
-            # your code here
             cd backend
             npm i
             npm run build
             cd ..
             # Zip the directory
             tar -C backend -czvf artifact.tar.gz .
+            cp ./artifact.tar.gz  .circleci/ansible/roles/deploy/files
+      - run:
+          name: Deploy backend
+          command: |
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt

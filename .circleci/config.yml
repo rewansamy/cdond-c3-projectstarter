@@ -305,6 +305,8 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
+            sudo yum install -y npm
+            sudo yum install -y curl
             apk add tar gzip ansible
             pip3 install awscli
             

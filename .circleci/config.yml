@@ -114,19 +114,17 @@ jobs:
              npm run test
   scan-frontend:
     docker:
-      - image: circleci/node:13.8.0
+       - image: circleci/node:13.8.0
     steps:
-     - checkout
-     - restore_cache:
-        keys: [frontend-build]
-     - run:
-         name: Run front-end Test
-         command: |
-            cd frontend
-            npm install
-            # npm install oauth-sign@^0.9.0
-            # Do not use the --force option along with the command below in your local
-            npm audit fix --audit-level=critical
+      - checkout
+      - restore_cache:
+         keys: [frontend-build]
+      - run:
+          name: Front-end Scan
+          command: |
+             cd frontend
+             npm install
+             npm audit fix --audit-level=critical --force
 
   scan-backend:
     docker:

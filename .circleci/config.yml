@@ -257,10 +257,11 @@ jobs:
             # your code here
             yum update -y
             yum install -y tar gzip
-            #yum install -y gzip tar
-            python3 -m pip install --user ansible
-            #sudo yum install -y curl
-            #sudo yum install -y npm
+            yum install python3
+            curl -sL https://deb.nodesource.com/setup_10.x | bash -
+            yum install -y nodejs
+            pip3 install ansible
+            pip3 install awscli
 
       - run:
           name: Get backend url
@@ -280,6 +281,7 @@ jobs:
           command: |
             # your code here
             cd frontend
+            cat .env
             npm install
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
@@ -306,9 +308,9 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            yum install -y npm
-            yum install -y curl
-            #apk add tar gzip ansible
+            apk add --update ansible
+            apk add --update nodejs npm
+            apl add curl
             pip3 install awscli
             
       - run:
@@ -344,11 +346,14 @@ workflows:
             requires: [build-backend]
       - deploy-infrastructure:
             requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+            filters:
+              branches:
+                only: [main]
       - configure-infrastructure:
-          requires: [deploy-infrastructure]
+            requires: [deploy-infrastructure]
       - run-migrations:
-          requires: [configure-infrastructure]
+            requires: [configure-infrastructure]
       - deploy-frontend:
-          requires: [run-migrations]
+            requires: [run-migrations]
       - deploy-backend:
-          requires: [run-migrations]
+            requires: [run-migrations]

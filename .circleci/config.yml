@@ -256,10 +256,11 @@ jobs:
           command: |
             # your code here
             yum update -y
-            yum install -y gzip tar
+            yum install -y tar gzip
+            #yum install -y gzip tar
             python3 -m pip install --user ansible
-            sudo yum install -y curl
-            sudo yum install -y npm
+            #sudo yum install -y curl
+            #sudo yum install -y npm
 
       - run:
           name: Get backend url
@@ -305,9 +306,9 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            sudo yum install -y npm
-            sudo yum install -y curl
-            apk add tar gzip ansible
+            yum install -y npm
+            yum install -y curl
+            #apk add tar gzip ansible
             pip3 install awscli
             
       - run:

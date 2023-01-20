@@ -228,7 +228,8 @@ jobs:
             #cat .env
             npm i
             # Run and save the migration output
-            npm run migrations
+            npm run migrations > migrations_dump.txt
+            cat migrations_dump.txt
       - run:
           name: Send migration results to KVDB
           command: |

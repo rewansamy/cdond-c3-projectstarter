@@ -224,6 +224,9 @@ jobs:
       - run:
           name: Run migrations
           command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
             cd backend
             #cat .env
             npm i
@@ -286,7 +289,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-         fingerprints: ["	44:15:3d:14:fb:2a:01:30:79:7e:39:35:97:8a:4e:90"] 
+         fingerprints: ["44:15:3d:14:fb:2a:01:30:79:7e:39:35:97:8a:4e:90"] 
       - attach_workspace:
           at: ~/
       - run:
